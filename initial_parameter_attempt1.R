@@ -19,7 +19,7 @@ RHS_op <- function(t,y,parameters){
   e1 <- parameters[9]
   h <- parameters[10]
   dy <- numeric(6)    # the output will be a numeric vector of length 6, because we have 6 differential equations
-  dy[1] <- -a*G*U
+  dy[1] <- -a*G*U+
   dy[2] <- a*G*U + b*R*U - c*U - d*U - e*U + f*T - g*U*S
   dy[3] <- g*U*S - d1*S - e1*S
   dy[4] <- c*U
@@ -53,14 +53,15 @@ systemsoln = function(parameters,x0,tn){
 
 # going to try a slightly different approach using code from online
 
-parameters <- c(a = 0.09,b=0.1,c=0.0283,d=0.4,e=0.1,f=0.75,g=0.15,d1=0.2,e1=0.2,h=0.25)
+parameters <- c(a = 0.0,b=(0.01+.2)/2,c=0.65,d=0.4,e=(0.01+.2)/2,f=0.85,g=0.15,d1=0.001,e1=0.2,h=0.25)
 state <- c(G = 2000,U = 1000,S = 1,F = 0,T = 1,R = 1)
 
 RHS_op <- function(t,state,parameters){
   with(as.list(c(state,parameters)),{
-    dG <- -a*G*U
+    dG <- -a*G*U+500
     dU <- a*G*U + b*R*U - c*U - d*U - e*U + f*T - g*U*S
-    dS <- g*U*S - d1*S - e1*S
+    #dS <- g*U*S - d1*S - e1*S
+    dS <- g*U*S(1-S/500)
     dF <- c*U
     dT <- d*U - h*T - f*T + d1*S
     dR <- h*T + e*U - b*R*U + e1*S
@@ -68,7 +69,7 @@ RHS_op <- function(t,state,parameters){
   })
 }
 
-times <- seq(0,100,by = 0.01)
+times <- seq(0,10,by = 0.01)
 
 Y <- ode(y = state, times = times, func = RHS_op, parms = parameters)
 head(Y) 
@@ -78,4 +79,3 @@ head(Y)
 par(oma = c(0, 0, 3, 0))
 plot(Y, xlab = "time", ylab = "-")
 mtext(outer = TRUE, side = 3, "Opioid Model", cex = 1.5)
-
