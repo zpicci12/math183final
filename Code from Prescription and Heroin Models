@@ -1,0 +1,84 @@
+library(deSolve)
+library(phaseR)
+library(pracma)
+
+#MIMICKING HEROIN PAPER
+
+a = 0.09
+b = 0.2
+c = 0.01
+d = 0.004
+e = 0.0001
+f = 0.5
+g = 0.1
+h = 0.17
+i = 0.1
+j = 0.04
+z = 0.004
+
+
+parameters <- c(a,b,c,d,e,f,g,h,i,j,z)
+state <- c(S = 199500, I = 102, T = 95, R = 100)
+
+N = 200000 #I set this as a constant population number, im a little confused how to have it as a function, which might be what's making the model look weird. 
+
+new_op <- function(t,state,parameters){
+  with(as.list(c(state,parameters)),{
+    dS <- -a*S*(I/N)
+    dI <- a*S*(I/N) + b*R + c*R*(I/N) + d*T - (1/(1+e*T))*(f*I + g*(R/N)*I + h*(S/N)*I) - (j+z)*I
+    dT <- (1/(1+e*T))*(f*I + g*(R/N)*I + h*(S/N)*I) - (d+I)*T
+    dR <- j*I + i*T - b*R - c*R*(I/N)
+    list(c(dS,dI,dT,dR))
+  })
+}
+
+times <- seq(0,5, 0.001)
+
+Y <- ode(y = state, times = times, func = new_op, parms = parameters)
+head(Y) 
+
+par(oma = c(0, 0, 3, 0))
+plot(Y, xlab = "time", ylab = "-", xlim=c(0,5))
+mtext(outer = TRUE, side = 3, "Opioid Model", cex = 1.5)
+
+
+#MIMICKING PRESCRIPTION PAPER
+
+a = 0.15
+b1 = 0.00094
+b2 = 0.00266
+c = 0.8
+d = 0.1
+e = 0.00744
+f = 0.9
+g = 0.2
+z = 0.00729
+z1 = 0.01159
+
+state <- c(S = 0.85, P = 0.1, A = 0.02, R = 0.03)
+parameters <- c(a,b1,b2,c,d,e,f,g,z,z1)
+
+pre_op <- function(t,state,parameters){
+  with(as.list(c(state,parameters)),{
+    dS <- -a*S - b1*S*A - b2*S*P + c*P + d*R + z*(P+R) + z1*A
+    dP <- a*S - (c+e+z)*P
+    dA <- e*P + f*R + b1*S*A + b2*S*P - (g+z1)*A
+    dR <- g*A - (d+f+z)*R
+    list(c(dS,dP,dA,dR))
+  })
+}
+
+times <- seq(0,5, 0.001)
+
+Y <- ode(y = state, times = times, func = pre_op, parms = parameters)
+head(Y) 
+
+par(oma = c(0, 0, 3, 0))
+plot(Y, xlab = "time", ylab = "-", xlim=c(0,5))
+mtext(outer = TRUE, side = 3, "Opioid Model", cex = 1.5)
+
+#YOOOO this looks the best so far!!! the parameters are designed to not have to divide by N, and population is self contained (so births and deaths cancel out). The issue is that fatal overdoses c
+#cycle back into susceptible to keep the population constant, so it is hard to count the number of deaths
+
+
+
