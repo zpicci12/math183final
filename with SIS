@@ -1,0 +1,56 @@
+library(deSolve)
+library(phaseR)
+library(pracma)
+
+#these parameters maintain a slight growth in S, 
+#2% of Susceptible are Abusers
+#The recovery population is 1/2 the Abuser population
+#There are, on average 1,570 fatal overdoses per year
+#From year to year over a long period
+
+a = 0.00000015 # from susceptible to abuse/misuse
+b = 0.000000001 # interaction term between susceptible and abuse
+#b2 = 0.00266
+c = 0.0007 # from abuse to recovery
+d = 0.008 # death of abusers/misusers
+e = 0.000744 #relapse
+f = 0.09 #interaction term between SIS and regular users\
+g = 0.002 #from SIS abuse to recovery
+h = 0.0007#SIS relapse
+#f = 0.9
+#g = 0.2
+#z = 0.00729
+#z1 = 0.01159
+
+##Assumptions for LA County Population: 
+#We want D1 = 1,591 (fatal overdoses in LA County in 2022)
+#S0: 9,830,000 (2021 LA County Population) #find adult population? 
+#A0: 294,900 (estimate that 3% of adults misuse opioids) -- is this number a lot? does policing affect this many drug users?
+#How would we want R1 to change? (what should the net rate of change be)
+#parameter fitting: find parameters such that given S0 and A0, there are D1 deaths 
+
+state <- c(S = 9830000, A = 196600, R = 98300, D = 0, U = 1)
+parameters <- c(a,b,c,d,e)
+
+N = 9830000
+
+pre_op <- function(t,state,parameters){
+  with(as.list(c(state,parameters)),{
+    dS <- -a*(S) - b*S*(A+U/2) + (0.0002*N) #added a natural replacement rate for better long-term outcomes
+    dA <- b*S*(A+U/2) - (c+d)*A+e*R+a*S - 0.0015*A - (1/(1+f*U))*A #non-overdose abuser death rate
+    dR <- c*A - e*R - 0.00015*R+g*U - h*R #recovered natural death rate
+    dD <- d*A
+    dU <- (1/(1+f*U))*A - g*U + h*R
+    list(c(dS,dA,dR,dD, dU))
+  })
+}
+
+times <- seq(0,10, 0.001)
+
+Y <- ode(y = state, times = times, func = pre_op, parms = parameters)
+head(Y) 
+tail(Y)
+
+par(oma = c(0, 0, 3, 0))
+plot(Y, xlab = "time", ylab = "-", xlim=c(0,10))
+mtext(outer = TRUE, side = 3, "Opioid Model", cex = 1.5)
