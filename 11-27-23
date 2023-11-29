@@ -37,10 +37,10 @@ N = 9830000
 pre_op <- function(t,state,parameters){
   with(as.list(c(state,parameters)),{
     dS <- -(b*A)*(S) - b*S*(A+U/2) + (0.00055*N) #added a natural replacement rate for better long-term outcomes
-    dA <- b*S*(A+U/2) - (c+d)*A + e*R + (b*A)*S - 0.0118*A #- (1/(1+f*U))*A #non-overdose abuser death rate
+    dA <- b*S*(A+U/2) - (c+d)*A + e*R + (b*A)*S - 0.0118*A #- l*U*(1-(U/k)) #non-overdose abuser death rate
     dR <- c*A - e*R - 0.00372*R+g*U - h*R #recovered natural death rate
     dD <- d*A
-    dU <- 0*(1/(1+f*U))*A - 0*g*U + 0*h*R
+    dU <- l*U*(1-(U/k)) - 0*g*U + 0*h*R
     list(c(dS,dA,dR,dD, dU))
   })
 }
