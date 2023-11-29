@@ -9,7 +9,7 @@ library(pracma)
 #From year to year over a long period
 
 a = 0.00000015 # from susceptible to abuse/misuse
-b = 0.000000001 # interaction term between susceptible and abuse
+b = 0.0000000012 # interaction term between susceptible and abuse
 #b2 = 0.00266
 c = 0.38 # from abuse to recovery
 d = 0.008 # death of abusers/misusers
