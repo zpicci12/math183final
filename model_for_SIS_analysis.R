@@ -7,8 +7,8 @@ library(pracma)
 #The recovery population is 1/2 the Abuser population
 
 a = 0.00000015 # from susceptible to abuse/misuse
-b = 0.0000000025 # interaction term between susceptible and abuse
-c = 0.38 # from abuse to recovery
+b = 0.0000000012 # interaction term between susceptible and abuse
+c = 0.3775 # from abuse to recovery
 d = 0.008 # death of abusers/misusers
 e = 0.75 #relapse
 g = 0.4 #from SIS abuse to recovery (assuming people at SIS recover slightly more than general abusers)
