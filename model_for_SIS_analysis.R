@@ -11,8 +11,8 @@ b = 0.0000000025 # interaction term between susceptible and abuse
 c = 0.38 # from abuse to recovery
 d = 0.008 # death of abusers/misusers
 e = 0.75 #relapse
-g = 0.02 #from SIS abuse to recovery
-l = 0  #adjusting this parameter would adjust willingness to use an SIS
+g = 0.4 #from SIS abuse to recovery (assuming people at SIS recover slightly more than general abusers)
+l = 3  #adjusting this parameter would adjust willingness to use an SIS and determine how quickly U reaches carrying capacity
 k = 6000 #adjusting this parameter changes the SIS carrying capacity
 
 ##Assumptions for LA County Population: 
@@ -31,9 +31,9 @@ pre_op <- function(t,state,parameters){
   with(as.list(c(state,parameters)),{
     dS <- -a*(S) - b*S*(A+U/2) + (0.00055*N) #added a natural replacement rate for better long-term outcomes
     dA <- b*S*(A+U/2) - (c+d)*A + e*R + (b/A)*S - 0.0118*A - l*U*(1-(U/k)) 
-    dR <- c*A - e*R - 0.00372*R+g*U #recovered natural death rate
+    dR <- c*A - e*R - 0.00372*R + g*U 
     dD <- d*A
-    dU <- l*U*(1-(U/k)) - 0*g*U 
+    dU <- l*U*(1-(U/k)) - g*U 
     list(c(dS,dA,dR,dD, dU))
   })
 }
