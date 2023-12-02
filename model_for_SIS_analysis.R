@@ -30,7 +30,7 @@ N = 9830000
 pre_op <- function(t,state,parameters){
   with(as.list(c(state,parameters)),{
     dS <- -(b*A)*(S) - b*S*(A+U/2) + (0.00055*N) #added a natural replacement rate for better long-term outcomes
-    dA <- b*S*(A+U/2) - (c+d)*A + e*R + (b/A)*S - 0.0118*A - l*U*(1-(U/k)) 
+    dA <- b*S*(A+U/2) - (c+d)*A + e*R + (b*A)*S - 0.0118*A - l*U*(1-(U/k)) 
     dR <- c*A - e*R - 0.00372*R + g*U 
     dD <- d*A
     dU <- l*U*(1-(U/k)) - g*U 
