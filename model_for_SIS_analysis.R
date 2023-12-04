@@ -1,12 +1,13 @@
 library(deSolve)
 library(phaseR)
 library(pracma)
+library(writexl)
+
 
 #these parameters maintain a slight growth in S, 
 #2% of Susceptible are Abusers
 #The recovery population is 1/2 the Abuser population
 
-a = 0.00000015 # from susceptible to abuse/misuse
 b = 0.0000000012 # interaction term between susceptible and abuse
 c = 0.3775 # from abuse to recovery
 d = 0.008 # death of abusers/misusers
@@ -22,8 +23,8 @@ k = 6000 #adjusting this parameter changes the SIS carrying capacity
 #There are, on average 1,570 fatal overdoses per year (without SIS)
 #Assume at time t=0, 100 people use SIS
 
-state <- c(S = 9830000, A = 196600, R = 98300, D = 0, U = 100)
-parameters <- c(a,b,c,d,e)
+state <- c(S = 9535000, A = 196500, R = 98300, D = 0, U = 100)
+parameters <- c(b,c,d,e,g,l,k)
 
 N = 9830000
 
