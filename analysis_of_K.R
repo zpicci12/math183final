@@ -12,7 +12,7 @@ d = 0.008 # death of abusers/misusers
 e = 0.75 #relapse
 g = 0.4 #from SIS abuse to recovery (assuming people at SIS recover slightly more than general abusers)
 l = 3  #adjusting this parameter would adjust willingness to use an SIS and determine how quickly U reaches carrying capacity
-k = 121150 #adjusting this parameter changes the SIS carrying capacity
+k = 6000 #adjusting this parameter changes the SIS carrying capacity
 
 ##Assumptions for LA County Population: 
 #S0: 9,830,000 (2021 LA County Population) #find adult population? 
@@ -54,7 +54,7 @@ run_op <- function(k){
 }
 
 #defining different scenarios for l
-k <- c(6000, 8650, 11550, 63500, 121150) #this says that we will go through 5 different scenarios: l = 1*1, l=1*2, ..., l=1*5
+k <- c(6000, 11550, 63500, 121150, 141500) #this says that we will go through 5 different scenarios: l = 1*1, l=1*2, ..., l=1*5
 
 #run and plot default scenario (here it is set to l = 1, we could change this)
 
