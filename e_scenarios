@@ -1,0 +1,46 @@
+#code is very similar, but we define the final ode a bit differently in order to have it run multiple times while changing one parameter
+#in this example, I am changing the "l" parameter, which relates to willingness to go to an SIS
+
+a = 0.0002359
+b = 0.0000000012 
+c = 0.3775 
+d = 0.008 
+e = 0.75
+g = 0.4 
+l = 3
+k = 6000
+
+pre_op <- function(t,state,parameters){
+  with(as.list(c(state,parameters)),{
+    dS <- -a*(S) - b*S*(A+U/2) + (0.00055*N) 
+    dA <- b*S*(A+U/2) - (c+d)*A + e*R + (b*A)*S - 0.0118*A - l*U*(1-(U/k)) 
+    dR <- c*A - e*R - 0.00372*R + g*U 
+    dD <- d*A
+    dU <- l*U*(1-(U/k)) - g*U 
+    list(c(dS,dA,dR,dD, dU))
+  })
+}
+
+parameters <- c(a,b,c,d,e,g,l,k)
+state <- c(S = 9535000, A = 196500, R = 98300, D = 0, U = 100)
+times <- seq(0,30, 0.001)
+
+run_op <- function(e){
+  parameters["e"] <- e
+  ode(y = state, times = times, func = pre_op, parms = parameters)
+}
+
+#defining different scenarios for l
+e <- c(.75, .14, .4, .6) #this says that we will go through 5 different scenarios: l = 1*1, l=1*2, ..., l=1*5
+
+#run and plot default scenario (here it is set to l = 1, we could change this)
+
+run0 <- run_op(e = e[1])
+plot(run0)
+#run other 4 scenarios of l values, where [-1] means all except the first
+
+runs <- lapply(e[-1], run_op)
+plot(run0, runs, las=1)
+legend("bottomright", legend = paste("e = ", e), lty=1:5, col = 1:5)
+
+#this should plot 5 scenarios on each of our 5 state plots!
