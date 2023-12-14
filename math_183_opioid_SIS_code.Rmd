@@ -1,0 +1,60 @@
+---
+title: "Math 183 Final Project Code (Opioid Crisis & SIS)"
+author: "Grace Zhao, Zoe Piccirillo, Sam Ford, Mira Terdiman"
+date: "2023-12-15"
+output: pdf_document
+---
+
+**General Model Code**
+We used this code to fit out parameters and examine baseline behavior. To model our SARD model, we set U=0.
+```{r}
+library(deSolve)
+library(phaseR)
+library(pracma)
+library(writexl)
+
+#these parameters maintain a slight growth in S, 
+#2% of Susceptible are Abusers
+#The recovery population is 1/2 the Abuser population
+
+b = 0.0000000012 # interaction term between susceptible and abuse
+c = 0.3775 # from abuse to recovery
+d = 0.008 # death of abusers/misusers
+e = 0.75 #relapse
+g = 0.4 #from SIS abuse to recovery (assuming people at SIS recover slightly more than general abusers)
+l = 3  #adjusting this parameter would adjust willingness to use an SIS and determine how quickly U reaches carrying capacity
+k = 6000 #adjusting this parameter changes the SIS carrying capacity
+
+#Assumptions for LA County Population: 
+#S0: 9,830,000 (2021 LA County Population) 
+#A0: 196,600 (estimate that 2% of adults abuse opioids)
+#There are, on average 1,570 fatal overdoses per year (without SIS)
+#Assume at time t=0, 100 people use SIS
+
+state <- c(S = 9535000, A = 196500, R = 98300, D = 0, U = 100) #to model SARD, let U=0
+parameters <- c(b,c,d,e,g,l,k)
+
+N = 9830000
+
+pre_op <- function(t,state,parameters){
+  with(as.list(c(state,parameters)),{
+    dS <- -(b*A)*(S) - b*S*(A+U/2) + (0.00055*N) 
+    dA <- b*S*(A+U/2) - (c+d)*A + e*R + (b*A)*S - 0.0118*A - l*U*(1-(U/k)) 
+    dR <- c*A - e*R - 0.00372*R + g*U 
+    dD <- d*A
+    dU <- l*U*(1-(U/k)) - g*U 
+    list(c(dS,dA,dR,dD, dU))
+  })
+}
+
+times <- seq(0,30, 0.001)
+
+Y <- ode(y = state, times = times, func = pre_op, parms = parameters)
+head(Y) 
+tail(Y)
+
+par(oma = c(0, 0, 3, 0))
+plot(Y, xlab = "time", ylab = "-", xlim=c(0,30))
+mtext(outer = TRUE, side = 3, "Opioid Model", cex = 1.5)
+```
+
